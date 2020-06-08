@@ -1,0 +1,231 @@
+-----------------------------------------------------------------------------------------------------------------
+Server Bring up
+
+# Start ZooKeeper
+> bin/zookeeper-server-start.sh config/zookeeper.properties
+
+# Start Kafka Server
+> bin/kafka-server-start.sh config/server.properties
+
+-----------------------------------------------------------------------------------------------------------------
+
+Topic Creation
+
+# Creating a new topic named "test" with 1 partition on 1 node
+> bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+
+# Listing all the topics
+> bin/kafka-topics.sh --list --zookeeper localhost:2181
+
+-----------------------------------------------------------------------------------------------------------------
+
+Sending and Receiving message
+
+# Run the producer in terminal and enter some message
+> bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+	message 1
+	message 2
+	message 3
+
+# Reading the message in a new terminal window
+> bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+	message 1
+	message 2
+	message 3
+
+-----------------------------------------------------------------------------------------------------------------
+
+Setting up a Multi-Broker Cluster
+
+# Create config files for each new broker
+> cp config/server.properties config/server-1.properties
+> cp config/server.properties config/server-2.properties
+
+# Update the following properties in the new files
+
+  config/server-1.properties:
+    broker.id=1
+    listeners=PLAINTEXT://:9093
+    log.dir=/tmp/kafka-logs-1
+
+  config/server-2.properties:
+    broker.id=2
+    listeners=PLAINTEXT://:9094
+    log.dir=/tmp/kafka-logs-2
+
+# Start the two new nodes in separate termial windows
+# You should already have Zookeeper running
+> bin/kafka-server-start.sh config/server-1.properties
+...
+> bin/kafka-server-start.sh config/server-2.properties
+...
+
+# Create new topic replicated to all 3 nodes
+> bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
+
+# See stats about our new topic
+> bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
+Topic:my-replicated-topic	PartitionCount:1	ReplicationFactor:3	Configs:
+	Topic: my-replicated-topic	Partition: 0	Leader: 1	Replicas: 1,2,0	Isr: 1,2,0
+
+# Compare this to our 'test' topic
+> bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic test
+Topic:test	PartitionCount:1	ReplicationFactor:1	Configs:
+	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+
+-----------------------------------------------------------------------------------------------------------------
+
+Testing Fault Tolerance
+
+# Send some messages to our replicated topic, then kill the producer
+> bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-replicated-topic
+...
+my test message 1
+my test message 2
+^C
+
+# Read messages from topic
+> bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic my-replicated-topic
+...
+my test message 1
+my test message 2
+^C
+
+# Now kill Broker 1
+> ps aux | grep server-1.properties
+7564 ttys002    0:15.91 /System/Library/Frameworks/JavaVM.framework/Versions/1.8/Home/bin/java...
+> kill -9 7564
+
+# Check which node is the leader for our topic now
+> bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
+
+# Try reading the messages again
+> bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic my-replicated-topic
+...
+my test message 1
+my test message 2
+^C
+
+-----------------------------------------------------------------------------------------------------------------
+
+Importing and Exporting data
+
+# Create a simple text file to work with that has 2 lines
+> echo -e "foo\nbar" > test.txt
+
+# Setup connector in standalone mode
+# pass in connection properties config
+# then file connection config
+# then file sync config (serialization)
+# all configs here ship w/ Kafka and act as templates
+> bin/connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties config/connect-file-sink.properties
+
+# Once the above connector starts running, it will read test.txt
+# and write to test.sink.txt
+# We can see this by reading the contents of the file
+> cat test.sink.txt
+foo
+bar
+
+# To see the data in the consumer run the following
+> bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic connect-test --from-beginning
+
+# In a separate terminal window, add some lines to the file
+echo "Another line" >> test.txt
+
+-----------------------------------------------------------------------------------------------------------------
+
+Stream Data Processing
+
+# Run built-in WordCount algorithm on data stream
+
+# Create some data in a file
+> echo -e "all streams lead to kafka\nhello kafka streams\njoin kafka summit" > file-input.txt
+
+# Send data to new topic
+> bin/kafka-topics.sh --create \
+            --zookeeper localhost:2181 \
+            --replication-factor 1 \
+            --partitions 1 \
+            --topic streams-file-input
+
+# Send data to the topic
+> bin/kafka-console-producer.sh --broker-list localhost:9092 --topic streams-file-input < file-input.txt
+
+# Run WordCount application, this will terminate after a few seconds
+> bin/kafka-run-class.sh org.apache.kafka.streams.examples.wordcount.WordCountDemo
+
+# Inspect the output by reading from the topic where the data was written
+# Use the built-in String and Long deserializers
+> bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+            --topic streams-wordcount-output \
+            --from-beginning \
+            --formatter kafka.tools.DefaultMessageFormatter \
+            --property print.key=true \
+            --property print.value=true \
+            --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer \
+            --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+
+# Output should look like the following
+all     1
+lead    1
+to      1
+hello   1
+streams 2
+join    1
+kafka   3
+summit  1
+
+-----------------------------------------------------------------------------------------------------------------
+
+General Kafka Commands
+
+Adding or Removing Topics:
+bin/kafka-topics.sh
+	--zookeeper zk_host:port/chroot
+	--create -topic my_topic_name
+	--partitions 20
+	--replication-factor 3
+	--config x=y
+
+Adding Partitons:
+bin/kafka-topics.sh
+	--zookeeper zk_host:port/chroot
+	--alter --topic my_topic_name
+	--partitions 40
+
+
+Modify Topic Configurations:
+bin/kafka-topics.sh
+	--zookeeper zk_host:port/chroot
+	--alter --topic my_topic_name
+	--config x=y
+	--delete-config x   //delete config
+
+Deleting a Topic:
+#topic deletion is disabled by default, to enable
+delete.topic.enable=true
+
+bin/kafka-topics.sh
+	--zookeeper zk_host:port/chroot
+	--delete --topic my_topic_name
+
+Checking Consumer Position:
+bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
+	--zookeeper localhost:2181
+	--group test
+#output
+Group	Topic	Pid	Offset	logSize	Lag	Owner
+g1	test	0	0	0	0	user1
+
+Configuring Consumer Groups:
+bin/kafka-consumer-groups.sh
+	--bootstrap-server broker1:9092
+	--list
+	--describe
+	--group test-consumer-group
+
+-----------------------------------------------------------------------------------------------------------------
+
+
+

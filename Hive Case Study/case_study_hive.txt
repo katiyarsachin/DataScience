@@ -1,0 +1,532 @@
+--Adding JAR file
+ADD JAR /opt/cloudera/parcels/CDH/lib/hive/lib/hive-hcatalog-core-1.1.0-cdh5.11.2.jar;
+
+--Setting values for hive internal variables
+SET hive.exec.max.dynamic.partitions=100000;
+SET hive.exec.max.dynamic.partitions.pernode=100000;
+
+--Creating Schema named case_study
+CREATE SCHEMA IF NOT EXISTS case_study;
+
+--Using schema named case_study
+USE case_study;
+
+--Creating table named taxi having data provided inside nyc_taxi_data folder
+CREATE EXTERNAL TABLE IF NOT EXISTS case_study.taxi (
+                                                        VendorID int, 
+                                                        Pickup_DateTime TIMESTAMP,
+                                                        Dropoff_DateTime TIMESTAMP,
+                                                        Passenger_Count int, Trip_Distance DOUBLE,
+                                                        RateCode_ID int, Store_And_Fwd_Flag char(1),
+                                                        Pickup_LocationID int, 
+                                                        DropOff_LocationID int, 
+                                                        Payment_Type int, 
+                                                        Fare_Amount DOUBLE,
+                                                        Extra DOUBLE,
+                                                        MTA_Tax DOUBLE,
+                                                        Tip_Amount DOUBLE,
+                                                        Tolls_Amount DOUBLE,
+                                                        Improvement_Surcharge DOUBLE,
+                                                        Total_Amount DOUBLE
+                                                    ) 
+                                                    ROW format delimited fields terminated BY ',' 
+                                                    LOCATION '/common_folder/nyc_taxi_data/' 
+                                                    tblproperties ("skip.header.line.count"="1");
+
+--Creating table named taxi_partitioned in which data have been partitioned based on year and then based on months
+CREATE EXTERNAL TABLE IF NOT EXISTS case_study.taxi_partitioned (
+                                                                    VendorID int,
+                                                                    Pickup_DateTime TIMESTAMP,
+                                                                    Dropoff_DateTime TIMESTAMP,
+                                                                    Passenger_Count int, 
+                                                                    Trip_Distance DOUBLE,
+                                                                    RateCode_ID int, 
+                                                                    Store_And_Fwd_Flag char(1),
+                                                                    Pickup_LocationID int, 
+                                                                    DropOff_LocationID int, 
+                                                                    Payment_Type int, 
+                                                                    Fare_Amount DOUBLE,
+                                                                    Extra DOUBLE,
+                                                                    MTA_Tax DOUBLE,
+                                                                    Tip_Amount DOUBLE,
+                                                                    Tolls_Amount DOUBLE,
+                                                                    Improvement_Surcharge DOUBLE,
+                                                                    Total_Amount DOUBLE,
+                                                                    Pickup_Day int
+                                                                ) 
+                                                                partitioned BY (Pickup_Year int, Pickup_Month int) 
+                                                                LOCATION '/user/hive/warehouse/taxi_data';
+
+--Inserting data into taxi_partitioned table
+INSERT overwrite TABLE case_study.taxi_partitioned partition (Pickup_Year,Pickup_Month)
+SELECT VendorID,
+       Pickup_DateTime,
+       Dropoff_DateTime,
+       Passenger_Count,
+       Trip_Distance,
+       RateCode_ID,
+       Store_And_Fwd_Flag,
+       Pickup_LocationID,
+       DropOff_LocationID,
+       Payment_Type,
+       Fare_Amount,
+       Extra,
+       MTA_Tax,
+       Tip_Amount,
+       Tolls_Amount,
+       Improvement_Surcharge,
+       Total_Amount,
+       date_format(Pickup_DateTime,'dd'),
+       date_format(Pickup_DateTime,'yyyy'),
+       date_format(Pickup_DateTime,'MM')
+FROM case_study.taxi;
+
+SELECT *
+FROM taxi_partitioned
+WHERE Pickup_Month NOT IN (11,12) OR Pickup_Year != 2017;
+-- 14 rows having month not as November and December and year not as 2017
+
+-- Creating a new table named taxi_partitioned_clustered which will filter above mentioned 14 rows and will have partitioned on Pickup Year and Month and data clustered on
+-- VendorID for fast query execution.
+CREATE EXTERNAL TABLE IF NOT EXISTS case_study.taxi_partitioned_clustered   (
+                                                                                VendorID int, 
+                                                                                Pickup_DateTime TIMESTAMP,
+                                                                                Dropoff_DateTime TIMESTAMP,
+                                                                                Passenger_Count int, 
+                                                                                Trip_Distance DOUBLE,
+                                                                                RateCode_ID int, 
+                                                                                Store_And_Fwd_Flag char(1),
+                                                                                Pickup_LocationID int, 
+                                                                                DropOff_LocationID int, 
+                                                                                Payment_Type int, 
+                                                                                Fare_Amount DOUBLE,
+                                                                                Extra DOUBLE,
+                                                                                MTA_Tax DOUBLE,
+                                                                                Tip_Amount DOUBLE,
+                                                                                Tolls_Amount DOUBLE,
+                                                                                Improvement_Surcharge DOUBLE,
+                                                                                Total_Amount DOUBLE,
+                                                                                Pickup_Day int
+                                                                            ) 
+                                                                            partitioned BY (Pickup_Year int, Pickup_Month int) 
+                                                                            clustered BY (VendorID) INTO 2 buckets 
+                                                                            LOCATION '/user/hive/warehouse/taxi_data';
+
+--Inserting data into taxi_partitioned_clustered table
+INSERT overwrite TABLE case_study.taxi_partitioned_clustered partition (Pickup_Year,Pickup_Month)
+SELECT VendorID,
+       Pickup_DateTime,
+       Dropoff_DateTime,
+       Passenger_Count,
+       Trip_Distance,
+       RateCode_ID,
+       Store_And_Fwd_Flag,
+       Pickup_LocationID,
+       DropOff_LocationID,
+       Payment_Type,
+       Fare_Amount,
+       Extra,
+       MTA_Tax,
+       Tip_Amount,
+       Tolls_Amount,
+       Improvement_Surcharge,
+       Total_Amount,
+       Pickup_Day,
+       Pickup_Year,
+       Pickup_Month
+FROM case_study.taxi_partitioned
+WHERE Pickup_Year=2017 AND Pickup_Month IN (11,12);
+-- Since we have already removed above mentioned 14 rows in taxi_partitioned_clustered table therefore all analysis done on taxi_partitioned_clustered table only contains
+-- data from November 2017 and December 2017. Thus we will analyse unusual or erroneous data in this newly created filtered table named "taxi_partitioned_clustered".
+
+----------------------***************Basic Data Quality Checks*************-----------------------
+
+SELECT VendorID AS TPEP_Provider,
+       count(*) AS No_of_records
+FROM taxi_partitioned_clustered
+GROUP BY VendorID;
+-- TPEP_Provider  No_of_records
+--   1               527386
+--   2               647169
+-- Dataset contains more data of vendor 2 in comparision to vendor 1
+
+--Data quality checks for each column are as follows:
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Passenger_Count <1;
+-- 6824 rows having passenger count less than 1
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Passenger_Count <1
+GROUP BY VendorID;
+-- VendorID count
+--  1       6813
+--  2       11
+-- From above results it seems that Vendor 1 has provided much more wrong data than Vendor 2 for Passenger Count variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Trip_distance =0 AND Pickup_LocationID != Dropoff_LocationID;
+-- 2352 rows having trip distance as 0 even if pickup and dropoff location id differ. For others i.e. if , if pickup and dropoff location id are same then
+-- trip distance as 0 is considered as a proper recored. It may be the case when people have cancelled their ride immediate after starting it.
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Trip_distance =0 AND Pickup_LocationID != Dropoff_LocationID
+GROUP BY VendorID;
+-- VendorID count
+--  1       1093
+--  2       1259
+-- From above results it seems that Both Vendor 1 and 2 have nearly equally provided wrong data for "Trip Distance" or "Pickup_LocationID and Dropoff_LocationID" combined.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE RateCode_ID NOT IN (1,2,3,4,5,6);
+-- 9 rows having rate code not in between [1,6]
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE RateCode_ID NOT IN (1,2,3,4,5,6)
+GROUP BY VendorID;
+-- VendorID count
+--  1       8
+--  2       1
+-- From above results it seems that Vendor 1 has provided much more wrong data than Vendor 2 for RateCode ID variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Fare_amount < 0 AND Payment_type NOT IN (3,4);
+-- 1 row having fare amount less than 0 and payment type not as "no charge" or "dispute". If payment type is "no charge" or "dispute" then it may be the case that fare
+-- amount is less than 0 (as taxi company is paying for that ride)
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Fare_amount < 0 AND Payment_type NOT IN (3,4)
+GROUP BY VendorID;
+-- VendorID count
+--  2       1
+-- From above results it seems that Vendor 2 has provided one wrong information for Fare Amount variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Extra NOT IN (0,0.5,1);
+-- 4856 rows having extra charges not in (0,0.5,1)
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Extra NOT IN (0,0.5,1)
+GROUP BY VendorID;
+-- VendorID count
+--  1       1823
+--  2       3033
+-- From above results it seems that Vendor 2 has provided much more wrong data than Vendor 1 for Extra variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE MTA_Tax NOT IN (0,0.5);
+-- 548 rows having MTA_Tax not in (0,0.5)
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE MTA_Tax NOT IN (0,0.5)
+GROUP BY VendorID;
+-- VendorID count
+--  1       1
+--  2       547
+-- From above results it seems that Vendor 2 has provided much more wrong data than Vendor 1 for MTA_Tax variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Improvement_Surcharge NOT IN (0,0.3);
+-- 562 rows having improvement surcharges not equal to 0 or 0.3
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Improvement_Surcharge NOT IN (0,0.3)
+GROUP BY VendorID;
+-- VendorID count
+--  2       562
+-- From above results it seems that Vendor 2 has provided 562 wrong information for Improvement_Surcharge variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Tip_Amount <0;
+-- 4 rows having tip amount less than 0
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Tip_Amount <0
+GROUP BY VendorID;
+-- VendorID count
+--  2       4
+-- From above results it seems that Vendor 2 has provided 4 wrong information for Tip_Amount variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Tolls_Amount <0;
+-- 3 rows having tolls amount less than 0
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Tolls_Amount <0
+GROUP BY VendorID;
+-- VendorID count
+--  2       3
+-- From above results it seems that Vendor 2 has provided 3 wrong information for Tolls_Amount variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Total_Amount < 0 AND Payment_type NOT IN (3,4);
+-- 1 row having total amount less than 0 and payment type not as "no charge" or "dispute". If payment type is "no charge" or "dispute" then it may be the case that fare
+-- amount is less than 0 (as taxi company is paying for that ride)
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE Total_Amount < 0 AND Payment_type NOT IN (3,4)
+GROUP BY VendorID;
+-- VendorID count
+--  2       1
+-- From above results it seems that Vendor 2 has provided one wrong information for Total_Amount variable.
+
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE (UNIX_TIMESTAMP(Dropoff_DateTime) - UNIX_TIMESTAMP(Pickup_DateTime)) <0;
+-- 73 rows having dropoff timestamp less than pickup timestamp which cannot be possible.
+
+SELECT VendorID,
+       count(*) AS COUNT
+FROM taxi_partitioned_clustered
+WHERE (UNIX_TIMESTAMP(Dropoff_DateTime) - UNIX_TIMESTAMP(Pickup_DateTime)) <0
+GROUP BY VendorID;
+-- VendorID count
+--  1       73
+-- From above results it seems that Vendor 1 has provided 73 wrong information for Pickup_DateTime and Dropoff_DateTime variables combined.
+
+-- Combining all above results to find total rows that contain unusual and erroneous data
+SELECT count(*)
+FROM taxi_partitioned_clustered
+WHERE Passenger_Count <1
+  OR (Trip_distance =0 AND Pickup_LocationID != Dropoff_LocationID)
+  OR RateCode_ID NOT IN (1,2,3,4,5,6)
+  OR (Fare_amount < 0 AND Payment_type NOT IN (3,4))
+  OR Extra NOT IN (0,0.5,1)
+  OR MTA_Tax NOT IN (0,0.5)
+  OR Improvement_surcharge NOT IN (0,0.3)
+  OR Tip_Amount <0
+  OR Tolls_Amount <0
+  OR (Total_Amount < 0 AND Payment_type NOT IN (3,4))
+  OR (UNIX_TIMESTAMP(Dropoff_DateTime) - UNIX_TIMESTAMP(Pickup_DateTime)) <0;
+-- 14295 rows having unusual or erroneous data in whole dataset.
+
+-- Checking for vendor who have provided wrong data
+SELECT VendorID,
+       count(*) AS Total_Count
+FROM taxi_partitioned_clustered
+WHERE Passenger_Count <1
+  OR (Trip_distance =0 AND Pickup_LocationID != Dropoff_LocationID)
+  OR RateCode_ID NOT IN (1,2,3,4,5,6)
+  OR (Fare_amount < 0 AND Payment_type NOT IN (3,4))
+  OR Extra NOT IN (0,0.5,1)
+  OR MTA_Tax NOT IN (0,0.5)
+  OR Improvement_surcharge NOT IN (0,0.3)
+  OR Tip_Amount <0
+  OR Tolls_Amount <0
+  OR (Total_Amount < 0 AND Payment_type NOT IN (3,4))
+  OR (UNIX_TIMESTAMP(Dropoff_DateTime) - UNIX_TIMESTAMP(Pickup_DateTime)) <0
+GROUP BY VendorID;
+-- From above query we can see that vendorID 1 is doing a bad job in providing the records having 9916 total rows with erroneous data, while vendorID 2 have 4379 erroneous
+-- data.
+
+--Creating table named taxi_partitioned_clustered_orc in which data has been partitioned by pickup year and month, clustered on vendor id into 2 buckets, stored as orc
+--having compressed data with the help of SNAPPY
+CREATE EXTERNAL TABLE IF NOT EXISTS case_study.taxi_partitioned_clustered_orc   (
+                                                                                    VendorID int, 
+                                                                                    Pickup_DateTime TIMESTAMP,
+                                                                                    Dropoff_DateTime TIMESTAMP,
+                                                                                    Passenger_Count int, 
+                                                                                    Trip_Distance DOUBLE,
+                                                                                    RateCode_ID int, 
+                                                                                    Store_And_Fwd_Flag char(1),
+                                                                                    Pickup_LocationID int, 
+                                                                                    DropOff_LocationID int, 
+                                                                                    Payment_Type int, 
+                                                                                    Fare_Amount DOUBLE,
+                                                                                    Extra DOUBLE,
+                                                                                    MTA_Tax DOUBLE,
+                                                                                    Tip_Amount DOUBLE,
+                                                                                    Tolls_Amount DOUBLE,
+                                                                                    Improvement_Surcharge DOUBLE,
+                                                                                    Total_Amount DOUBLE,
+                                                                                    Pickup_Day int
+                                                                                ) 
+                                                                                partitioned BY (Pickup_Year int, Pickup_Month int) 
+                                                                                clustered BY (VendorID) INTO 2 buckets 
+                                                                                stored AS orc 
+                                                                                LOCATION '/user/hive/warehouse/taxi_data_orc' 
+                                                                                tblproperties ("orc.compress"="SNAPPY");
+
+--Inserting data into taxi_partitioned_clustered_orc table
+INSERT overwrite TABLE case_study.taxi_partitioned_clustered_orc partition(Pickup_Year, Pickup_Month)
+SELECT *
+FROM case_study.taxi_partitioned_clustered
+WHERE Passenger_Count >0
+  AND ((Trip_distance = 0 AND Pickup_LocationID = Dropoff_LocationID) OR (Trip_distance != 0))
+  AND RateCode_ID IN (1,2,3,4,5,6)
+  AND (Fare_amount >= 0 OR (Fare_amount < 0 AND Payment_type IN (3,4)))
+  AND Extra IN (0,0.5,1)
+  AND MTA_Tax IN (0,0.5)
+  AND Improvement_Surcharge IN (0,0.3)
+  AND Tip_Amount >=0
+  AND Tolls_Amount >=0
+  AND ((Total_Amount < 0 AND Payment_type IN (3,4)) OR Total_Amount >= 0)
+  AND (UNIX_TIMESTAMP(Dropoff_DateTime) - UNIX_TIMESTAMP(Pickup_DateTime)) >=0;
+--Total 1160260 rows selected in taxi_partitioned_clustered_orc table. This table contains no error data and has been used for further analysis.
+
+----------------------***************Analysis 1*************-----------------------
+
+----------- Answer 1 -------------
+
+SELECT Pickup_Month AS MONTH,
+       round(avg(Fare_Amount),2) AS Avg_Fare
+FROM case_study.taxi_partitioned_clustered_orc
+GROUP BY Pickup_Month;
+-- month avg_fare
+--  11    12.95
+--  12    12.74
+
+----------- Answer 2 -------------
+
+SELECT Passenger_Count,
+       count(*) AS No_of_trips
+FROM case_study.taxi_partitioned_clustered_orc
+GROUP BY Passenger_Count;
+-- query to find out no of trips that are made by each level of Passenger_count
+-- No of passengers travelling alone : 822417
+
+SELECT count(*) AS Trips_for_solo_passenger
+FROM case_study.taxi_partitioned_clustered_orc
+WHERE passenger_count>1;
+-- No fo passengers travelling with someone : 337843
+-- Therefore based on the above results we can say that people mostly prefer to travel solo.
+
+----------- Answer 3 -------------
+
+SELECT Payment_Type,
+       count(*) AS COUNT
+FROM case_study.taxi_partitioned_clustered_orc
+GROUP BY Payment_Type
+ORDER BY COUNT DESC
+LIMIT 1;
+-- query to find most preferred mode of payment, finds out payment type 1 i.e. Credit Card is most preferred mode of payment having a count of 781644.
+
+----------- Answer 4 -------------
+
+SELECT round(avg(Tip_Amount),2) AS Avg_Tip_Amount
+FROM case_study.taxi_partitioned_clustered_orc;
+-- query to find average tip amount, comes out to be 1.83
+
+SELECT round(avg(Tip_Amount),2) AS Avg_Tip_Amount,
+       round(percentile_approx(Tip_Amount,0.25),2) AS TipAmount_25th_percentile,
+       round(percentile_approx(Tip_Amount,0.50),2) AS TipAmount_50th_percentile,
+       round(percentile_approx(Tip_Amount,0.75),2) AS TipAmount_75th_percentile
+FROM case_study.taxi_partitioned_clustered_orc;
+-- query to find average tip amount, 25th percentile, 50th percetile and 75th percentile of tip amount
+-- Based on above query we found that 1.83 is the average tip amount while 0, 1.35 and 2.45 are the 25th, 50th and 75th percentile of tip amount respectively. Thus based
+-- on these results (i.e. 1.83 is much bigger than 1.35) we can conclude that average tip is not a representative statistic (of the central tendency) of "tip amount paid".
+
+----------- Answer 5 -------------
+
+SELECT round((t1.count_with_extra/t2.count_without_extra)*100,2)
+FROM
+  (SELECT count(*) AS count_with_extra
+   FROM case_study.taxi_partitioned_clustered_orc
+   WHERE Extra !=0) t1,
+  (SELECT count(*) AS count_without_extra
+   FROM case_study.taxi_partitioned_clustered_orc) t2;
+-- query to find fraction (percentage) of total trips on which an extra charge is levied which comes out to be 46.04 percentage
+
+-----------------------**************Analysis 2************--------------------
+
+----------- Answer 1 -------------
+
+SELECT round(corr(Passenger_Count,Tip_Amount),2) AS correlation_between_passenger_count_and_tip_amount
+FROM case_study.taxi_partitioned_clustered_orc;
+
+-- query to find correlation between Passenger_Count and Tip_Amount which comes out to be -0.01. This value is very close to zero thus we can say that Passenger Count and
+-- Tip Amount are not correlated to each other.
+
+----------- Answer 2 -------------
+
+SELECT a.segment AS Tip_Paid,
+       round((a.share/b.total)*100,2) AS Percentage_Share
+FROM
+  (SELECT count(*) AS SHARE,
+          CASE
+              WHEN Tip_Amount >=0
+                   AND Tip_Amount<5 THEN '[0,5)'
+              WHEN Tip_Amount >=5
+                   AND Tip_Amount<10 THEN '[5,10)'
+              WHEN Tip_Amount >=10
+                   AND Tip_Amount<15 THEN '[10,15)'
+              WHEN Tip_Amount >=15
+                   AND Tip_Amount<20 THEN '[15,20)'
+              WHEN Tip_Amount >=20 THEN '>=20'
+          END AS SEGMENT
+   FROM case_study.taxi_partitioned_clustered_orc
+   GROUP BY CASE
+                WHEN Tip_Amount >=0
+                     AND Tip_Amount<5 THEN '[0,5)'
+                WHEN Tip_Amount >=5
+                     AND Tip_Amount<10 THEN '[5,10)'
+                WHEN Tip_Amount >=10
+                     AND Tip_Amount<15 THEN '[10,15)'
+                WHEN Tip_Amount >=15
+                     AND Tip_Amount<20 THEN '[15,20)'
+                WHEN Tip_Amount >=20 THEN '>=20'
+            END) a,
+  (SELECT count(*) AS total
+   FROM case_study.taxi_partitioned_clustered_orc) b;
+-- query to calculate percentage share of each tip bucket compared to overall tips paid
+--  Tip_Paid  |   PercentageShare
+--  [0,5)     |   92.34
+--  [5,10)    |   5.64
+--  [10,15)   |   1.73
+--  [15,20)   |   0.2
+--  >=20      |   0.1
+-- From above result we can say that most of the people prefer to pay tip between [0,5).
+
+----------- Answer 3 -------------
+
+SELECT Pickup_Month,
+       round(avg(Trip_Distance/((UNIX_TIMESTAMP(Dropoff_DateTime) - UNIX_TIMESTAMP(Pickup_DateTime))/3600)),2) AS Avg_Speed
+FROM case_study.taxi_partitioned_clustered_orc
+GROUP BY Pickup_Month
+ORDER BY Avg_Speed DESC
+LIMIT 1;
+-- query to find month having maximum average speed
+-- Based on above query we can say that December month is having maximum average speed of 11.05 miles per hour.
+
+----------- Answer 4 -------------
+
+SELECT concat(Pickup_Day,'-December') AS date,
+       round(avg(Trip_Distance/((UNIX_TIMESTAMP(Dropoff_DateTime) - UNIX_TIMESTAMP(Pickup_DateTime))/3600)),2) AS Avg_Speed
+FROM case_study.taxi_partitioned_clustered_orc
+WHERE Pickup_Month=12 AND Pickup_Day IN (25,31)
+GROUP BY Pickup_Day;
+-- query to find average speed on 25th and 31st december
+-- From above query we found out that 25th and 31st december has 15.25 and 13.22 miles per hour average speed which is higher than average speed in overall december
+-- month (i.e. 11.05 miles per hour).
+
+------------- END ----------------
