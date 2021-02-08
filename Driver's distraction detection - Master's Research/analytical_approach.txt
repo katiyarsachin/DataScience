@@ -1,0 +1,362 @@
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Safe Driving
+Type detected as : Talking to the passenger
+Type detected as : Safe Driving
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Operating the radio
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Safe Driving
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Drinking
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Operating the radio
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+Type detected as : Talking on the phone using the right hand
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+Type detected as : Talking on the phone using the right hand
+Type detected as : Reaching behind
+Type detected as : Reaching behind
+Type detected as : Reaching behind
+Type detected as : Talking to the passenger
+Type detected as : Reaching behind
+Type detected as : Reaching behind
+Type detected as : Reaching behind
+Type detected as : Talking on the phone using the right hand
+Type detected as : Operating the radio
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Operating the radio
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+centroid changed
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Operating the radio
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Drinking
+Type detected as : Talking on the phone using the right hand
+Type detected as : Operating the radio
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+Type detected as : Talking to the passenger
+  class total predicted
+0    c0    20        19		19
+1    c1    20        20		20
+2    c2    20        16		16
+3    c3    20        14		14
+4    c4    20        20		20
+5    c5    20        20		20
+6    c6    20         0		0
+7    c7    20         6		6
+8    c8    20         0		0
+9    c9    20         0		20 //removing template coding
+
+C:\Users\Sachin Katiyar\Desktop\Masters DS\distraction during driving\My Research>
+
+
+
+
+
+
+
+C:\Users\Sachin Katiyar\Desktop\Masters DS\distraction during driving\My Research>python final3.py
+11:26:36.705983
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Operating the radio
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Safe Driving
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Texting using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : No class detected
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Talking on the phone using the right hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Operating the radio
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Texting using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Talking on the phone using the left hand
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+Type detected as : Operating the radio
+11:50:00.282187
+  class total predicted
+0    c0    20        19
+1    c1    20        20
+2    c2    20        17
+3    c3    20        14
+4    c4    20        20
+5    c5    20        20
+
+
+
+0.926829268292683
+array([[ 8,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+       [ 0,  8,  0,  0,  0,  0,  0,  0,  0,  0],
+       [ 0,  0,  3,  0,  0,  0,  0,  0,  0,  0],
+       [ 1,  0,  0,  9,  0,  0,  0,  0,  1,  0],
+       [ 0,  0,  0,  0,  8,  0,  0,  0,  0,  0],
+       [ 0,  0,  0,  0,  0,  8,  0,  0,  0,  0],
+       [ 0,  0,  0,  0,  0,  0,  8,  0,  0,  0],
+       [ 0,  0,  0,  0,  0,  0,  0,  9,  0,  4],
+       [ 0,  0,  0,  0,  0,  0,  0,  0,  5,  0],
+       [ 0,  0,  0,  0,  0,  0,  0,  0,  0, 10]])
